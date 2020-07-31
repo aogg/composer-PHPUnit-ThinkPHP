@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-namespace think;
 
 // 加载基础文件
 use think\console\Input;
@@ -79,5 +78,5 @@ array_unshift($_SERVER['argv'], 'think');
     }
 
     return $exitCode;
-})->call((new App())->console);
+})->call((new \think\App())->console);
 

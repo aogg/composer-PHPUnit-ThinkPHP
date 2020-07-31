@@ -25,13 +25,13 @@
     "autoload": {
         "files": [],
         "psr-4": {
-            "aogg\\think-phpunit\\": "src/"
+            "aogg\\phpunit\\think\\": "src/"
         }
     },
     "extra": {
         "think": {
             "services": [
-                "aogg\\think-phpunit\\Service"
+                "aogg\\phpunit\\think\\Service"
             ]
         }
     }

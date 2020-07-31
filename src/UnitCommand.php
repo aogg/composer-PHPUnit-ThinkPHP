@@ -4,7 +4,7 @@
  * Date: 2020/7/31
  */
 
-namespace aogg;
+namespace aogg\phpunit\think;
 
 
 

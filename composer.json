@@ -1,6 +1,6 @@
 {
     "name": "aogg/think-phpunit",
-    "description": "ThinkPHP use PHPUnit.",
+    "description": "ThinkPHP6 use PHPUnit.",
     "keywords": [
         "PHPUnit",
         "phpunit",
@@ -23,16 +23,16 @@
         "phpunit/phpunit": "^7.0"
     },
     "autoload": {
-        "files": [
-            "src/config.php"
-        ],
+        "files": [],
         "psr-4": {
-            "aogg\\": "src/"
+            "aogg\\think-phpunit\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "tests\\": "tests/"
+    "extra": {
+        "think": {
+            "services": [
+                "aogg\\think-phpunit\\Service"
+            ]
         }
     }
 }

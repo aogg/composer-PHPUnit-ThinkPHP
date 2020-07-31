@@ -24,7 +24,7 @@
     },
     "autoload": {
         "files": [
-            "src/config.php",
+            "src/config.php"
         ],
         "psr-4": {
             "aogg\\": "src/"

@@ -1,0 +1,83 @@
+#!/usr/bin/env php
+<?php
+
+namespace think;
+
+// 加载基础文件
+use think\console\Input;
+use think\console\Output;
+
+require __DIR__ . '/vendor/autoload.php';
+array_shift($_SERVER['argv']);
+array_unshift($_SERVER['argv'], 'unit');
+array_unshift($_SERVER['argv'], 'think');
+// 应用初始化
+// (new App())->console->run();
+
+
+// @see \think\Console::doRun
+(function (){
+    $doRunFunc = function (Input $input, Output $output){
+//        if (true === $input->hasParameterOption(['--version', '-V'])) {
+//            $output->writeln($this->getLongVersion());
+//
+//            return 0;
+//        }
+
+        $name = $this->getCommandName($input);
+
+//        if (true === $input->hasParameterOption(['--help', '-h'])) {
+//            if (!$name) {
+//                $name  = 'help';
+//                $input = new Input(['help']);
+//            } else {
+//                $this->wantHelps = true;
+//            }
+//        }
+
+        if (!$name) {
+            $name  = $this->defaultCommand;
+            $input = new Input([$this->defaultCommand]);
+        }
+
+        $command = $this->find($name);
+
+        return $this->doRunCommand($command, $input, $output);
+    };
+
+    $input  = new Input();
+    $output = new Output();
+
+    $this->configureIO($input, $output);
+
+    try {
+        $exitCode = $doRunFunc->call($this, $input, $output);
+    } catch (\Exception $e) {
+        if (!$this->catchExceptions) {
+            throw $e;
+        }
+
+        $output->renderException($e);
+
+        $exitCode = $e->getCode();
+        if (is_numeric($exitCode)) {
+            $exitCode = (int) $exitCode;
+            if (0 === $exitCode) {
+                $exitCode = 1;
+            }
+        } else {
+            $exitCode = 1;
+        }
+    }
+
+    if ($this->autoExit) {
+        if ($exitCode > 255) {
+            $exitCode = 255;
+        }
+
+        exit($exitCode);
+    }
+
+    return $exitCode;
+})->call((new App())->console);
+

@@ -7,7 +7,7 @@ namespace think;
 use think\console\Input;
 use think\console\Output;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../../../autoload.php';
 array_shift($_SERVER['argv']);
 array_unshift($_SERVER['argv'], 'unit');
 array_unshift($_SERVER['argv'], 'think');

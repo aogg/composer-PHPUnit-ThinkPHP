@@ -1,3 +1,3 @@
 <?php
 
-app()->console->addCommand(\aogg\UnitCommand::class);
+\think\Container::getInstance()->make(\think\App::class)->console->addCommand(\aogg\UnitCommand::class);

@@ -1,0 +1,36 @@
+{
+    "name": "aogg/think-phpunit",
+    "description": "ThinkPHP use PHPUnit.",
+    "keywords": [
+        "PHPUnit",
+        "phpunit",
+        "thinkphp"
+    ],
+    "homepage": "https://github.com/aogg/composer-PHPUnit-ThinkPHP/",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "aogg",
+            "email": "aogg@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "ext-json": "*",
+        "topthink/framework": "^6.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "files": [],
+        "psr-4": {
+            "aogg\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "tests\\": "tests/"
+        }
+    }
+}

@@ -9,7 +9,8 @@ namespace aogg\phpunit\think;
 
 abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
 {
-    use traits\CrawlerTrait;
+    use traits\CrawlerTrait,
+        traits\AssertTrait;
 
 
     protected function getApiUrlString(string $url = '', array $vars = [])

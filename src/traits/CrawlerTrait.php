@@ -32,6 +32,10 @@ trait CrawlerTrait
     /** @var  \think\Response */
     protected $response;
 
+    protected $saveCookieKey = '';
+
+    protected $app;
+
     public function get($uri, array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers, parse_url($uri, PHP_URL_PATH), 'GET');
@@ -68,6 +72,38 @@ trait CrawlerTrait
         return $this;
     }
 
+    public function getApp($cache = false)
+    {
+        if ($cache && $this->app){
+            return $this->app;
+        }
+
+        $app = new \think\App();
+
+        $app->initialize();
+
+        return $this->app = $app;
+    }
+
+    /**
+     * 获取在test的session
+     * 只有$this->setSaveCookieKey()才可以，而且要在之后发生session才有值
+     *
+     * @return array
+     */
+    public function getTestSessionAll()
+    {
+        if (!$this->getSaveCookieKey()) {
+            return [];
+        }
+
+        $app = $this->getApp();
+
+        $sessionAll = $app->cache->get($this->getSaveCookieKey() . '-session');
+
+        return $sessionAll?:[];
+    }
+
     public function call($method, $uri, $post = [], $server = [])
     {
         $this->currentUri = $this->prepareUrlForRequest($uri);
@@ -78,7 +114,7 @@ trait CrawlerTrait
         $tempGlobals = $GLOBALS;
 
 
-        $app = new \think\App();
+        $app = $this->getApp(true);
 
         // 执行HTTP应用并响应
 
@@ -91,19 +127,99 @@ trait CrawlerTrait
         parse_str(parse_url($uri, PHP_URL_QUERY), $_GET);
         $_POST = $post;
         $_REQUEST = array_merge($_GET, $_POST);
-        // 暂无
+
+
         $_COOKIE = [];
+        if ($this->getSaveCookieKey()) { // 获取cookie
+            $cookie = $app->cache->get($this->getSaveCookieKey())?:[];
+            foreach ($cookie as $cookieKey => $cookieItem) {
+                $cookieValue = isset($cookieItem[0])?$cookieItem[0]:'';
+
+                $_COOKIE[$cookieKey] = $cookieValue;
+            }
+
+        }
+
+
+        // 暂无
         $_FILES = [];
         $request = $request->__make($app);
         $request->setMethod($method);
         $request->setUrl($this->currentUri);
 
+
         $response = $http->run($request);
+
+        if ($this->getSaveCookieKey()){ // 保存cookie
+            $app->cache->set($this->getSaveCookieKey() . '-session', $app->session->all());
+            $app->cache->set($this->getSaveCookieKey(), $app->cookie->getCookie());
+        }
+        $http->end($response);
 
 
         $GLOBALS = $tempGlobals;
 
         return $this->response = $response;
+    }
+
+
+    protected function transformHeadersToServerVars(array $headers, $uri = '', $method = 'GET')
+    {
+        $publicPath = dirname(dirname(dirname(dirname(dirname(__DIR__)))));
+        // 模拟server
+        $server = array (
+            'HTTP_X_REQUESTED_WITH' => 'xmlhttprequest',
+            'SCRIPT_NAME' => '/index.php',
+            'REQUEST_METHOD' => $method,
+            'SERVER_PROTOCOL' => 'HTTP/1.1',
+            'GATEWAY_INTERFACE' => 'CGI/1.1',
+            'SCRIPT_FILENAME' => "{$publicPath}public/index.php",
+            'CONTEXT_PREFIX' => '',
+            'REQUEST_SCHEME' => 'http',
+            'DOCUMENT_ROOT' => "{$publicPath}/public",
+            'REMOTE_ADDR' => '127.0.0.1',
+            'SERVER_PORT' => '80',
+            'SERVER_ADDR' => '127.0.0.1',
+            'SERVER_NAME' => 'localhost',
+            'SERVER_SOFTWARE' => 'Apache/2.4.39 (Win64) OpenSSL/1.1.1b mod_fcgid/2.3.9a',
+            'SERVER_SIGNATURE' => '',
+            'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9',
+            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+            'HTTP_CONNECTION' => 'close',
+            'HTTP_HOST' => 'localhost',
+            'REDIRECT_STATUS' => '200',
+            'FCGI_ROLE' => 'RESPONDER',
+            'PHP_SELF' => '/index.php',
+            'REQUEST_TIME_FLOAT' => microtime(true),
+            'REQUEST_TIME' => time(),
+        );
+
+        if (!empty($uri)) {
+            $server['REQUEST_URI'] = isset($server['REQUEST_URI']) ? $server['REQUEST_URI'] : $uri;
+            $server['QUERY_STRING'] = isset($server['QUERY_STRING']) ? $server['QUERY_STRING'] : $uri;
+            $server['REDIRECT_QUERY_STRING'] = isset($server['REDIRECT_QUERY_STRING']) ? $server['REDIRECT_QUERY_STRING'] : $uri;
+            $server['REDIRECT_URL'] = isset($server['REDIRECT_URL']) ? $server['REDIRECT_URL'] : $uri;
+        }
+
+
+        $prefix = 'HTTP_';
+
+        foreach ($headers as $name => $value) {
+            $name = strtr(strtoupper($name), '-', '_');
+
+            if (!\think\helper\Str::startsWith($name, $prefix) && 'CONTENT_TYPE' != $name) {
+                $name = $prefix . $name;
+            }
+
+            $server[$name] = $value;
+        }
+
+
+        // \think\app\MultiApp::getScriptName的bug
+        $_SERVER['SCRIPT_FILENAME'] = $server['SCRIPT_FILENAME'];
+
+
+        return $server;
     }
 
     public function seeJson($data = null, $negate = false)
@@ -184,6 +300,25 @@ trait CrawlerTrait
         return $expected;
     }
 
+    /**
+     * @param string $saveCookieKey
+     * @return $this
+     */
+    public function setSaveCookieKey($saveCookieKey = 'phpunit-cookie')
+    {
+        $this->saveCookieKey = $saveCookieKey;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSaveCookieKey()
+    {
+        return $this->saveCookieKey;
+    }
+
     protected function seeStatusCode($status)
     {
         $this->assertEquals($status, $this->response->getCode());
@@ -224,61 +359,4 @@ trait CrawlerTrait
 //        return $this;
 //    }
 
-    protected function transformHeadersToServerVars(array $headers, $uri = '', $method = 'GET')
-    {
-        $publicPath = dirname(dirname(dirname(dirname(dirname(__DIR__)))));
-        // 模拟server
-        $server = array (
-            'SCRIPT_NAME' => '/index.php',
-            'REQUEST_METHOD' => $method,
-            'SERVER_PROTOCOL' => 'HTTP/1.1',
-            'GATEWAY_INTERFACE' => 'CGI/1.1',
-            'SCRIPT_FILENAME' => "{$publicPath}public/index.php",
-            'CONTEXT_PREFIX' => '',
-            'REQUEST_SCHEME' => 'http',
-            'DOCUMENT_ROOT' => "{$publicPath}/public",
-            'REMOTE_ADDR' => '127.0.0.1',
-            'SERVER_PORT' => '80',
-            'SERVER_ADDR' => '127.0.0.1',
-            'SERVER_NAME' => 'localhost',
-            'SERVER_SOFTWARE' => 'Apache/2.4.39 (Win64) OpenSSL/1.1.1b mod_fcgid/2.3.9a',
-            'SERVER_SIGNATURE' => '',
-            'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9',
-            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-            'HTTP_CONNECTION' => 'close',
-            'HTTP_HOST' => 'localhost',
-            'REDIRECT_STATUS' => '200',
-            'FCGI_ROLE' => 'RESPONDER',
-            'PHP_SELF' => '/index.php',
-            'REQUEST_TIME_FLOAT' => microtime(true),
-            'REQUEST_TIME' => time(),
-        );
-
-        if (!empty($uri)) {
-            $server['REQUEST_URI'] = isset($server['REQUEST_URI']) ? $server['REQUEST_URI'] : $uri;
-            $server['QUERY_STRING'] = isset($server['QUERY_STRING']) ? $server['QUERY_STRING'] : $uri;
-            $server['REDIRECT_QUERY_STRING'] = isset($server['REDIRECT_QUERY_STRING']) ? $server['REDIRECT_QUERY_STRING'] : $uri;
-            $server['REDIRECT_URL'] = isset($server['REDIRECT_URL']) ? $server['REDIRECT_URL'] : $uri;
-        }
-
-
-        $prefix = 'HTTP_';
-
-        foreach ($headers as $name => $value) {
-            $name = strtr(strtoupper($name), '-', '_');
-
-            if (!\think\helper\Str::startsWith($name, $prefix) && 'CONTENT_TYPE' != $name) {
-                $name = $prefix . $name;
-            }
-
-            $server[$name] = $value;
-        }
-
-
-        // \think\app\MultiApp::getScriptName的bug
-        $_SERVER['SCRIPT_FILENAME'] = $server['SCRIPT_FILENAME'];
-
-
-        return $server;
-    }
 }

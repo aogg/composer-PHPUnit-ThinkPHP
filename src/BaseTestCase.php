@@ -58,6 +58,7 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
      * 运行测试类
      *
      * @param $theClass
+     * @return \PHPUnit\Framework\TestResult
      */
     public function runTestClass($theClass)
     {
@@ -68,5 +69,7 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(0, $result->failureCount(), '运行的测试类failureCount: ' . $result->failureCount());
         $this->assertEquals(0, $result->errorCount(), '运行的测试类errorCount: ' . $result->failureCount());
+
+        return $result;
     }
 }

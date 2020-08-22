@@ -73,9 +73,14 @@ trait RunTestClassTrait
      *
      * @param $theClass
      * @return \PHPUnit\Framework\TestResult
+     * @throws \ReflectionException
      */
     public function runTestClass($theClass)
     {
+        if (is_object($theClass) && $theClass instanceof \PHPUnit\Framework\TestCase) {
+            $theClass = new \ReflectionClass($theClass);
+        }
+
         /** @var \PHPUnit\Framework\TestResult $result */
         $result = $this->createResult();
         $t      = new \PHPUnit\Framework\TestSuite($theClass);

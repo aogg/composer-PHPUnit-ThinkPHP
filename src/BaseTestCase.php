@@ -10,7 +10,9 @@ namespace aogg\phpunit\think;
 abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
 {
     use traits\CrawlerTrait,
-        traits\AssertTrait;
+        traits\AssertTrait,
+        traits\RunTestClassTrait;
+
 
     protected function getRequestUrlString(string $url = '', array $vars = [], $prefix = '/api/')
     {
@@ -53,23 +55,4 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
         return trim($uri, '/');
     }
 
-
-    /**
-     * 运行测试类
-     *
-     * @param $theClass
-     * @return \PHPUnit\Framework\TestResult
-     */
-    public function runTestClass($theClass)
-    {
-        $result = $this->createResult();
-        $t      = new \PHPUnit\Framework\TestSuite($theClass);
-
-        $t->run($result);
-
-        $this->assertEquals(0, $result->failureCount(), '运行的测试类failureCount: ' . $result->failureCount());
-        $this->assertEquals(0, $result->errorCount(), '运行的测试类errorCount: ' . $result->failureCount());
-
-        return $result;
-    }
 }

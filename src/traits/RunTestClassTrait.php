@@ -87,8 +87,16 @@ trait RunTestClassTrait
 
         $t->run($result);
 
-        $this->assertEquals(0, $result->failureCount(), '运行的测试类failureCount: ' . $result->failureCount());
-        $this->assertEquals(0, $result->errorCount(), '运行的测试类errorCount: ' . $result->failureCount());
+        $this->assertEquals(
+            0, $result->failureCount(),
+            '运行的测试类failureCount: ' . $result->failureCount() .
+            (isset($result->failures()[0]) ? (PHP_EOL . $result->failures()[0]->getTestName()) : '')
+        );
+        $this->assertEquals(
+            0, $result->errorCount(),
+            '运行的测试类errorCount: ' . $result->errorCount() .
+            (isset($result->errors()[0]) ? (PHP_EOL . $result->errors()[0]->getTestName()) : '')
+        );
 
         return $result;
     }

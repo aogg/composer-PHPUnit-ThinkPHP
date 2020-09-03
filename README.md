@@ -19,8 +19,9 @@ composer require aogg/think-phpunit:dev-master
 ```
 
 
+# 使用
 
-# BaseTestCase
+## BaseTestCase
 
 支持测试类中调用控制器的方法
 ```php
@@ -36,3 +37,11 @@ composer require aogg/think-phpunit:dev-master
         return $data;
     }
 ```
+
+
+
+
+# 配置PHPStorm的PHPUnit
+![配置PHPStorm的PHPUnit](https://raw.githubusercontent.com/aogg/composer-PHPUnit-ThinkPHP/master/docs/PHPStorm%E9%85%8D%E7%BD%AEPHPUnit.jpg)
+
+

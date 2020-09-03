@@ -3,7 +3,7 @@ ThinkPHP6 use PHPUnit
 ThinkPHP6使用PHPUnit
 
 
-# 使用
+# 介绍
 > 1. [phpunit](https://github.com/aogg/composer-PHPUnit-ThinkPHP/blob/master/src/phpunit)可以给PHPStorm指定phpunit的路径
 > 2. 可以通过php think unit执行命令
 > 3. [BaseTestCase](https://github.com/aogg/composer-PHPUnit-ThinkPHP/blob/master/src/BaseTestCase.php)是测试基类，继承phpunit的测试基类，并提供ThinkPHP6专用方法
@@ -19,7 +19,7 @@ composer require aogg/think-phpunit:dev-master
 ```
 
 
-# 使用
+# 详细
 
 ## BaseTestCase
 

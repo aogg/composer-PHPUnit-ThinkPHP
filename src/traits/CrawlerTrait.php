@@ -192,6 +192,7 @@ trait CrawlerTrait
             'PHP_SELF' => '/index.php',
             'REQUEST_TIME_FLOAT' => microtime(true),
             'REQUEST_TIME' => time(),
+            'HTTP_X_PHPUNIT' => 1, // phpunit的标识
         );
 
         if (!empty($uri)) {

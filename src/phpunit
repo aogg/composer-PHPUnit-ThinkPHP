@@ -6,6 +6,8 @@
 use think\console\Input;
 use think\console\Output;
 
+define('PHPUNIT_RUNTIME', true); // 可用于phpunit执行中判断
+
 require __DIR__ . '/../../../autoload.php';
 array_shift($_SERVER['argv']);
 array_unshift($_SERVER['argv'], 'unit');

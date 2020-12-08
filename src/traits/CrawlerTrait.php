@@ -72,7 +72,7 @@ trait CrawlerTrait
         return $this;
     }
 
-    public function getApp($cache = false)
+    public function getApp($cache = false, $setApp = true)
     {
         if ($cache && $this->app){
             return $this->app;
@@ -81,6 +81,10 @@ trait CrawlerTrait
         $app = new \think\App();
 
         $app->initialize();
+
+        if (!$setApp){
+            return $app;
+        }
 
         return $this->app = $app;
     }
@@ -97,9 +101,7 @@ trait CrawlerTrait
             return [];
         }
 
-        $app = $this->getApp();
-
-        $sessionAll = $app->cache->get($this->getSaveCookieKey() . '-session');
+        $sessionAll = app('cache', [], true)->get($this->getSaveCookieKey() . '-session');
 
         return $sessionAll?:[];
     }
@@ -112,9 +114,11 @@ trait CrawlerTrait
         // 无法通过新类实现request，因为一般应用会定义新的request，然后注入的时候写这个类名
 
         $tempGlobals = $GLOBALS;
+        unset($GLOBALS['argv']);
 
 
         $app = $this->getApp(true);
+        $app->phpunit = true;
 
         // 执行HTTP应用并响应
 
@@ -130,14 +134,21 @@ trait CrawlerTrait
 
 
         $_COOKIE = [];
+        $cache = app('cache', [], true);
         if ($this->getSaveCookieKey()) { // 获取cookie
-            $cookie = $app->cache->get($this->getSaveCookieKey())?:[];
+            $cookie = $cache->get($this->getSaveCookieKey()) ?: [];
             foreach ($cookie as $cookieKey => $cookieItem) {
                 $cookieValue = isset($cookieItem[0])?$cookieItem[0]:'';
 
                 $_COOKIE[$cookieKey] = $cookieValue;
             }
 
+            // 处理当前的session
+//            $sessionId = $cache->get($this->getSaveCookieKey() . '-session-id') ?: '';
+//            $sessionId && $app->session->setId($sessionId);
+
+            // 处理多模块bug，未确定app()和$app
+            app()->session->forgetDriver();
         }
 
 
@@ -151,8 +162,9 @@ trait CrawlerTrait
         $response = $http->run($request);
 
         if ($this->getSaveCookieKey()){ // 保存cookie
-            $app->cache->set($this->getSaveCookieKey() . '-session', $app->session->all());
-            $app->cache->set($this->getSaveCookieKey(), $app->cookie->getCookie());
+            $cache->set($this->getSaveCookieKey() . '-session', $app->session->all());
+//            $cache->set($this->getSaveCookieKey() . '-session-id', $app->session->getId());
+            $cache->set($this->getSaveCookieKey(), $app->cookie->getCookie());
         }
         $http->end($response);
 

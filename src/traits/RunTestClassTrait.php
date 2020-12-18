@@ -22,10 +22,8 @@ trait RunTestClassTrait
      */
     protected static $upRunTestClassesResult = [];
 
-    public static function setUpBeforeClass(): void
+    public static function bootUpBeforeClassRunTestClassTrait(): void
     {
-        parent::setUpBeforeClass(); // @see \PHPUnit\Framework\TestCase::setUpBeforeClass
-
         $currentObject = new static;
         foreach (static::$upRunTestClasses as $upRunTestClass) {
 

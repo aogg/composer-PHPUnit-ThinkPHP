@@ -14,6 +14,18 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
         traits\RunTestClassTrait;
 
 
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass(); // @see \PHPUnit\Framework\TestCase::setUpBeforeClass
+
+        foreach (class_uses_recursive(static::class) as $trait) {
+            $method = 'bootUpBeforeClass'.basename(str_replace('\\', '/', $trait));
+            if (is_callable("static::$method")) {
+                call_user_func("static::$method");
+            }
+        }
+    }
+
     protected function getRequestUrlString(string $url = '', array $vars = [], $prefix = '/api/')
     {
         return url(

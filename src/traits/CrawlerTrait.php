@@ -36,6 +36,14 @@ trait CrawlerTrait
 
     protected $app;
 
+    /**
+     * 内部缓存用
+     * 与app隔离开
+     *
+     * @var \think\cache\Driver
+     */
+    protected static $consoleCacheStore;
+
     public function get($uri, array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers, parse_url($uri, PHP_URL_PATH), 'GET');
@@ -93,6 +101,8 @@ trait CrawlerTrait
      * 获取在test的session
      * 只有$this->setSaveCookieKey()才可以，而且要在之后发生session才有值
      *
+     * 不会检测session是否过期与失效
+     *
      * @return array
      */
     public function getTestSessionAll()
@@ -101,9 +111,14 @@ trait CrawlerTrait
             return [];
         }
 
-        $sessionAll = app('cache', [], true)->get($this->getSaveCookieKey() . '-session');
+        $sessionAll = self::getConsoleCacheStorePri()->get($this->getSaveCookieKey() . '-session');
 
         return $sessionAll?:[];
+    }
+
+    private static function getConsoleCacheStorePri()
+    {
+        return self::$consoleCacheStore?:cache()->store();
     }
 
     public function call($method, $uri, $post = [], $server = [])
@@ -134,7 +149,8 @@ trait CrawlerTrait
 
 
         $_COOKIE = [];
-        $cache = app('cache', [], true);
+        /** @var \think\Cache $cache */
+        $cache = self::getConsoleCacheStorePri();
         if ($this->getSaveCookieKey()) { // 获取cookie
             $cookie = $cache->get($this->getSaveCookieKey()) ?: [];
             foreach ($cookie as $cookieKey => $cookieItem) {

@@ -80,7 +80,7 @@ trait CrawlerTrait
         return $this;
     }
 
-    public function getApp($cache = false, $setApp = true)
+    public function getApp($cache = true, $setApp = true)
     {
         if ($cache && $this->app){
             return $this->app;

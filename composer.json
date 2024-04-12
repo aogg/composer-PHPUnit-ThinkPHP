@@ -25,7 +25,7 @@
         "files": [],
         "psr-4": {
             "aogg\\phpunit\\think\\": "src/",
-            "aogg\\phpunit\\think\\testsDir": "tests/"
+            "aogg\\phpunit\\think\\testsDir\\": "tests/"
         }
     },
     "extra": {

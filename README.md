@@ -50,3 +50,23 @@ composer require aogg/think-phpunit:dev-master
 
 
 
+# 本地调试composer类库
+```json
+{
+
+  "repositories": [
+
+    {
+      "type": "path",
+
+      "url": "/app/origin/my/github/composer-PHPUnit-ThinkPHP"
+
+    }
+
+  ]
+}
+```
+```bash
+composer require aogg/think-phpunit:dev-master
+```
+

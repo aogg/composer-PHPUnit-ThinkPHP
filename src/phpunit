@@ -8,7 +8,21 @@ use think\console\Output;
 
 define('PHPUNIT_RUNTIME', true); // 可用于phpunit执行中判断
 
-require __DIR__ . '/../../../autoload.php';
+if (is_file(__DIR__ . '/../../../autoload.php')) {
+    require __DIR__ . '/../../../autoload.php';
+}else if (!empty($_SERVER['argv']) && !empty($_SERVER['argv'][0])) {
+    $vendorDir = dirname(dirname(dirname(dirname($_SERVER['argv'][0]))));
+    if (is_file($vendorDir . '/autoload.php')) {
+        require $vendorDir . '/autoload.php';
+    }else{
+
+        echo 'not file exists ' . $vendorDir . '/autoload.php';
+        exit(1);
+    }
+}else{
+    echo 'not file exists ' . __DIR__ . '/../../../autoload.php';
+    exit(1);
+}
 array_shift($_SERVER['argv']);
 array_unshift($_SERVER['argv'], 'unit');
 array_unshift($_SERVER['argv'], 'think');

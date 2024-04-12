@@ -24,6 +24,11 @@ trait RunTestClassTrait
 
     public static function bootUpBeforeClassRunTestClassTrait(): void
     {
+
+        if (class_exists(\PHPUnit\TextUI\Application::class)) { // phpunit 10
+            return;
+        }
+
         $currentObject = new static;
         foreach (static::$upRunTestClasses as $upRunTestClass) {
 

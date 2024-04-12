@@ -15,15 +15,17 @@
         }
     ],
     "require": {
-        "php": ">=7.2.0",
+        "php": ">=7.2.0 || >=8.1",
         "ext-json": "*",
-        "phpunit/phpunit": "^7.0",
-        "topthink/framework": "^6.0.0"
+        "phpunit/phpunit": "^7.0 || ^10.5.17",
+        "topthink/framework": "^6.0.0",
+        "ext-pcntl": "*"
     },
     "autoload": {
         "files": [],
         "psr-4": {
-            "aogg\\phpunit\\think\\": "src/"
+            "aogg\\phpunit\\think\\": "src/",
+            "aogg\\phpunit\\think\\testsDir": "tests/"
         }
     },
     "extra": {

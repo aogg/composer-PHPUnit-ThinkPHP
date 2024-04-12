@@ -185,7 +185,9 @@ trait CrawlerTrait
         $http->end($response);
 
 
-        $GLOBALS = $tempGlobals;
+        foreach ($tempGlobals as $key => $tempGlobal) {
+            $GLOBALS[$key] = $tempGlobal;
+        }
 
         return $this->response = $response;
     }

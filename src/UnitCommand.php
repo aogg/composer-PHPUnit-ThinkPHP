@@ -34,8 +34,50 @@ class UnitCommand extends \think\console\Command
         array_unshift($argv, 'phpunit');
 //        Blacklist::$blacklistedClassNames = [];
 
-        $code = (new \PHPUnit\TextUI\Command())->run($argv, false);
+        if (class_exists(\PHPUnit\TextUI\Application::class)) { // phpunit 10
+
+            $code = static::fork_run(function ()use($argv){
+                (new \PHPUnit\TextUI\Application)->run($argv);
+            });
+        }else{
+            $code = (new \PHPUnit\TextUI\Command())->run($argv, false);
+        }
 
         return $code;
+    }
+
+    /**
+     * 启用子进程
+     *
+     * @param $childFunc
+     * @return bool
+     */
+    public static function fork_run($childFunc){
+        try{
+
+            $pid = pcntl_fork();
+        }catch (\Exception | \Throwable $exception){
+            echo '创建PHPUnit子进程失败--异常，请检查' . PHP_EOL;
+
+            return false;
+        }
+
+        if ($pid < 0) {
+            echo '创建PHPUnit子进程失败，请检查' . PHP_EOL;
+
+            return false;
+        }
+
+        if ($pid == 0) {
+            /*      子进程代码      */
+            cli_set_process_title(
+                "php child process aogg/composer-PHPUnit-ThinkPHP");
+            return call_user_func($childFunc, $pid);
+//            exit;
+        }else{
+            pcntl_wait($status);
+        }
+
+        return $pid;
     }
 }

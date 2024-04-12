@@ -18,10 +18,10 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
     {
         parent::setUpBeforeClass(); // @see \PHPUnit\Framework\TestCase::setUpBeforeClass
 
-        foreach (class_uses_recursive(static::class) as $trait) {
+        foreach (\aogg\phpunit\think\ThinkHelperClass::class_uses_recursive(static::class) as $trait) {
             $method = 'bootUpBeforeClass'.basename(str_replace('\\', '/', $trait));
-            if (is_callable("static::$method")) {
-                call_user_func("static::$method");
+            if (is_callable([static::class, $method])) {
+                call_user_func([static::class, $method]);
             }
         }
     }

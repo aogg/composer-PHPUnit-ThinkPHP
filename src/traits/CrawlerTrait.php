@@ -143,7 +143,7 @@ trait CrawlerTrait
         $request = $app->make('request');
 
         $_SERVER = $server;
-        parse_str(parse_url($uri, PHP_URL_QUERY), $_GET);
+        parse_str(parse_url($uri, PHP_URL_QUERY)?:'', $_GET);
         $_POST = $post;
         $_REQUEST = array_merge($_GET, $_POST);
 

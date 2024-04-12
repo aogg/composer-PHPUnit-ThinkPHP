@@ -30,7 +30,7 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
     {
         return url(
             rtrim($prefix, '/') . '/' . ltrim($url, '/'), $vars, false,
-            parse_url(config('app.app_host'), PHP_URL_HOST)
+            parse_url(config('app.app_host')?:'', PHP_URL_HOST)?:false
         )->build();
     }
 

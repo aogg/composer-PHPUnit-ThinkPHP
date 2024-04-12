@@ -33,7 +33,7 @@ composer require aogg/think-phpunit:dev-master
      */
     public function testStoreVerifyFinishList()
     {
-        $data = $this->get($this->getApiUrlString('product/list', ['limit' => 1]));
+        $data = $this->get($this->getRequestUrlString('product/list', ['limit' => 1]));
 
         return $data;
     }

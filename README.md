@@ -49,6 +49,12 @@ composer require aogg/think-phpunit:dev-master
 ![代码示例](https://github.com/aogg/composer-PHPUnit-ThinkPHP/assets/8998031/4a5d476a-9b9a-41f6-9e2a-0ef0d490d5d2)
 
 
+## 配置PHPStorm的远端PHPUnit
+<img width="285" alt="image" src="https://github.com/aogg/composer-PHPUnit-ThinkPHP/assets/8998031/d602c6df-75d6-4536-add0-e38c883ab890">  
+选择指定目录 /vendor/aogg/think-phpunit/src/phpunit  
+<img width="202" alt="image" src="https://github.com/aogg/composer-PHPUnit-ThinkPHP/assets/8998031/57067794-a4d3-4769-a31e-bd82718d0148">  
+
+
 
 # 本地调试composer类库
 ```json

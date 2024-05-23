@@ -23,12 +23,25 @@ if (is_file(__DIR__ . '/../../../autoload.php')) {
     echo 'not file exists ' . __DIR__ . '/../../../autoload.php';
     exit(1);
 }
+
+function is_absolute($path) {
+    return ($path[0] === '/' || $path[0] === '\\'
+        || (strlen($path) > 3 && ctype_alpha($path[0]) && $path[1] === ':' && ($path[2] === '\\' || $path[2] === '/'))
+    );
+}
+
+// 支持软连接
+if (!is_absolute($_SERVER['SCRIPT_NAME'])) {
+    $rootPath = dirname($_SERVER['PWD'] . '/' . $_SERVER['SCRIPT_NAME'], 5);
+}else{
+    $rootPath = dirname($_SERVER['SCRIPT_NAME'], 5);
+}
+
 array_shift($_SERVER['argv']);
 array_unshift($_SERVER['argv'], 'unit');
 array_unshift($_SERVER['argv'], 'think');
 // 应用初始化
 // (new App())->console->run();
-
 
 // @see \think\Console::doRun
 (function (){
@@ -94,5 +107,5 @@ array_unshift($_SERVER['argv'], 'think');
     }
 
     return $exitCode;
-})->call((new \think\App())->console);
+})->call((new \think\App($rootPath))->console);
 

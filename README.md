@@ -8,6 +8,7 @@ ThinkPHP6使用PHPUnit
 > 2. 可以通过php think unit执行命令
 > 3. [BaseTestCase](https://github.com/aogg/composer-PHPUnit-ThinkPHP/blob/master/src/BaseTestCase.php)是测试基类，继承phpunit的测试基类，并提供ThinkPHP6专用方法
 > 4. 继承\aogg\phpunit\think\BaseTestCase基类
+> 5. 支持项目软连接情况下运行单元测试
 
 
 

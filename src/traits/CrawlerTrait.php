@@ -98,6 +98,46 @@ trait CrawlerTrait
     }
 
     /**
+     * 获取tp think的入口的app
+     *
+     * @return \think\App
+     */
+    public function getOriginApp()
+    {
+        return $GLOBALS['phpunit_tp_app'];
+    }
+
+    /**
+     * 获取tp think的入口的output
+     * 
+     * @return \think\console\Output
+     */
+    public function getOriginAppOutput()
+    {
+        return $this->getOriginApp()->get('phpunit_output');
+    }
+
+    /**
+     * 获取tp think的入口的Input
+     * 
+     * @return \think\console\Input
+     */
+    public function getOriginAppInput()
+    {
+        return $this->getOriginApp()->get('phpunit_input');
+    }
+
+    /**
+     * 获取tp think的入口的command
+     *
+     * @return \aogg\phpunit\think\UnitCommand
+     */
+    public function getOriginAppCommand()
+    {
+        return $this->getOriginApp()->get('phpunit_command');
+    }
+
+    /**
      * 获取在test的session
      * 只有$this->setSaveCookieKey()才可以，而且要在之后发生session才有值
      *

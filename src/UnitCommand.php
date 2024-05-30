@@ -32,6 +32,12 @@ class UnitCommand extends \think\console\Command
         array_shift($argv);
         array_shift($argv);
         array_unshift($argv, 'phpunit');
+
+        // 允许访问到output
+        $GLOBALS['phpunit_tp_app'] = $this->getApp();
+        bind('phpunit_input', $input);
+        bind('phpunit_output', $output);
+        bind('phpunit_command', $this);
 //        Blacklist::$blacklistedClassNames = [];
 
         if (class_exists(\PHPUnit\TextUI\Application::class)) { // phpunit 10

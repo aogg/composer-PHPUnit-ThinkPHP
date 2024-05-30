@@ -17,7 +17,7 @@ ThinkPHP6使用PHPUnit
 ## 安装
 
 ```bash
-composer require aogg/think-phpunit:dev-master
+composer require aogg/think-phpunit:v0.3
 ```
 
 

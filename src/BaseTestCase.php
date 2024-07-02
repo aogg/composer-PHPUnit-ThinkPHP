@@ -7,11 +7,31 @@
 namespace aogg\phpunit\think;
 
 
+use think\db\exception\PDOException;
+
 abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
 {
     use traits\CrawlerTrait,
         traits\AssertTrait,
         traits\RunTestClassTrait;
+
+    /**
+     * 异常报错
+     *
+     * @param \Throwable $t
+     * @return never
+     * @throws \Throwable
+     * @throws PDOException
+     */
+    protected function onNotSuccessfulTest(\Throwable $t): never /* The :void return type declaration that should be here would cause a BC issue */
+    {
+        if ($t instanceof \think\db\exception\PDOException) {
+            $failure = new \PHPUnit\Framework\OutputError((data_get($t->getData(), 'Database Status.Error SQL')));
+            $this->getTestResultObject()->addFailure($this, $failure, time());
+        }
+
+        throw $t;
+    }
 
 
     public static function setUpBeforeClass(): void

@@ -87,4 +87,75 @@ abstract class BaseTestCase extends \PHPUnit\Framework\TestCase
         return trim($uri, '/');
     }
 
+    /**
+     * @param $commandNamespace
+     * @return \think\console\Command
+     * @inheritDoc
+     */
+    public function getNewCommandObject($commandNamespace)
+    {
+        if (0){
+            return new $commandNamespace();
+        }
+
+        /** @var \think\console\Command $object */
+        $object = new $commandNamespace();
+
+        $reflectionClass = new \ReflectionClass($object);
+        $property = $reflectionClass->getProperty('input');
+        $property->setAccessible(true);
+        $property->setValue($object, $this->getOriginAppInput());
+        $property->setAccessible(false);
+
+        $property = $reflectionClass->getProperty('output');
+        $property->setAccessible(true);
+        $property->setValue($object, $this->getOriginAppOutput());
+        $property->setAccessible(false);
+
+        $object->setApp($this->getOriginApp());
+
+        return $object;
+    }
+
+
+    /**
+     * 获取tp think的入口的app
+     *
+     * @return \think\App
+     */
+    public function getOriginApp()
+    {
+        return $GLOBALS['phpunit_tp_app'];
+    }
+
+    /**
+     * 获取tp think的入口的output
+     *
+     * @return \think\console\Output
+     */
+    public function getOriginAppOutput()
+    {
+        return $this->getOriginApp()->get('phpunit_output');
+    }
+
+    /**
+     * 获取tp think的入口的Input
+     *
+     * @return \think\console\Input
+     */
+    public function getOriginAppInput()
+    {
+        return $this->getOriginApp()->get('phpunit_input');
+    }
+
+    /**
+     * 获取tp think的入口的command
+     *
+     * @return \aogg\phpunit\think\UnitCommand
+     */
+    public function getOriginAppCommand()
+    {
+        return $this->getOriginApp()->get('phpunit_command');
+    }
+
 }
